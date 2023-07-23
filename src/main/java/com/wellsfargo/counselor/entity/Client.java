@@ -6,11 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Advisor {
+public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long advisorId;
+    private Long clientId;
+
+    // load only when it accessed
+    @ManyToOne(fetch = FetchType.LAZY)
+    // mapping with advisor entity
+    @JoinColumn(name = "advisorId", nullable = false)
+    private Advisor advisor;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Portfolio> portfolios = new ArrayList<>();
 
     @Column(nullable = false)
     private String firstName;
@@ -27,22 +36,35 @@ public class Advisor {
     @Column(nullable = false)
     private String email;
 
-    // creating the one-to-many relationship with client
-    @OneToMany(mappedBy = "advisor")
-    private List<Client> clients = new ArrayList<>();
+    protected Client() {}
 
-    protected Advisor() {}
-
-    public Advisor(String firstName, String lastName, String address, String phone, String email) {
+    public Client(String firstName, String lastName, String address, String phone, String email, Advisor advisor) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.phone = phone;
         this.email = email;
+        this.advisor = advisor;
     }
 
-    public Long getAdvisorId() {
-        return advisorId;
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public Advisor getAdvisor() {
+        return advisor;
+    }
+
+    public void setAdvisor(Advisor advisor) {
+        this.advisor = advisor;
+    }
+
+    public List<Portfolio> getPortfolios() {
+        return portfolios;
+    }
+
+    public void setPortfolios(List<Portfolio> portfolios) {
+        this.portfolios = portfolios;
     }
 
     public String getFirstName() {
@@ -83,14 +105,5 @@ public class Advisor {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    
-    public List<Client> getClients() {
-        return clients;
-    }
-
-    public void setClients(List<Client> clients) {
-        this.clients = clients;
     }
 }
